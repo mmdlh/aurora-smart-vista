@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as DevicesRouteImport } from './routes/devices'
+import { Route as EnergyRouteImport } from './routes/energy'
+import { Route as SafetyRouteImport } from './routes/safety'
+import { Route as TrafficRouteImport } from './routes/traffic'
+import { Route as VehiclesRouteImport } from './routes/vehicles'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevicesRoute = DevicesRouteImport.update({
+  id: '/devices',
+  path: '/devices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnergyRoute = EnergyRouteImport.update({
+  id: '/energy',
+  path: '/energy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafetyRoute = SafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrafficRoute = TrafficRouteImport.update({
+  id: '/traffic',
+  path: '/traffic',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VehiclesRoute = VehiclesRouteImport.update({
+  id: '/vehicles',
+  path: '/vehicles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/devices': typeof DevicesRoute
+  '/energy': typeof EnergyRoute
+  '/safety': typeof SafetyRoute
+  '/traffic': typeof TrafficRoute
+  '/vehicles': typeof VehiclesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/devices': typeof DevicesRoute
+  '/energy': typeof EnergyRoute
+  '/safety': typeof SafetyRoute
+  '/traffic': typeof TrafficRoute
+  '/vehicles': typeof VehiclesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/devices': typeof DevicesRoute
+  '/energy': typeof EnergyRoute
+  '/safety': typeof SafetyRoute
+  '/traffic': typeof TrafficRoute
+  '/vehicles': typeof VehiclesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/devices'
+    | '/energy'
+    | '/safety'
+    | '/traffic'
+    | '/vehicles'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/analytics'
+    | '/devices'
+    | '/energy'
+    | '/safety'
+    | '/traffic'
+    | '/vehicles'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/devices'
+    | '/energy'
+    | '/safety'
+    | '/traffic'
+    | '/vehicles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  DevicesRoute: typeof DevicesRoute
+  EnergyRoute: typeof EnergyRoute
+  SafetyRoute: typeof SafetyRoute
+  TrafficRoute: typeof TrafficRoute
+  VehiclesRoute: typeof VehiclesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/devices': {
+      id: '/devices'
+      path: '/devices'
+      fullPath: '/devices'
+      preLoaderRoute: typeof DevicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/energy': {
+      id: '/energy'
+      path: '/energy'
+      fullPath: '/energy'
+      preLoaderRoute: typeof EnergyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safety': {
+      id: '/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof SafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/traffic': {
+      id: '/traffic'
+      path: '/traffic'
+      fullPath: '/traffic'
+      preLoaderRoute: typeof TrafficRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vehicles': {
+      id: '/vehicles'
+      path: '/vehicles'
+      fullPath: '/vehicles'
+      preLoaderRoute: typeof VehiclesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  DevicesRoute: DevicesRoute,
+  EnergyRoute: EnergyRoute,
+  SafetyRoute: SafetyRoute,
+  TrafficRoute: TrafficRoute,
+  VehiclesRoute: VehiclesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
