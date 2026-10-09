@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { ECharts, EChartsOption } from 'echarts';
 
 export type ChartKind = 'line' | 'bar' | 'mixed' | 'donut' | 'radar' | 'horizontal' | 'heatmap';
-type ChartProps = { kind: ChartKind; labels?: string[]; names?: string[]; data?: number[][]; size?: string; period?: string; suffix?: string };
+type ChartProps = { kind: ChartKind; labels?: string[] | undefined; names?: string[] | undefined; data?: number[][] | undefined; size?: string; period?: string; suffix?: string };
 export function Chart({ kind, labels, names, data, size = '', period = '日', suffix = '' }: ChartProps) {
   const container = useRef<HTMLDivElement>(null);
   const instance = useRef<ECharts | null>(null);
@@ -24,9 +24,9 @@ export function Chart({ kind, labels, names, data, size = '', period = '日', su
         context.fillStyle = value;
         context.fillRect(0, 0, 1, 1);
         const pixel = context.getImageData(0, 0, 1, 1).data;
-        return `rgba(${pixel[0]},${pixel[1]},${pixel[2]},${pixel[3] / 255})`;
+        return `rgba(${pixel[0] ?? 0},${pixel[1] ?? 0},${pixel[2] ?? 0},${(pixel[3] ?? 255) / 255})`;
       };
-      const colors = ['--primary', '--cyan', '--success', '--violet', '--warning'].map(token);
+      const colors: [string, string, string, string, string] = [token('--primary'), token('--cyan'), token('--success'), token('--violet'), token('--warning')];
       const ink = token('--foreground');
       const muted = token('--muted-foreground');
       const border = token('--border');
@@ -51,9 +51,9 @@ export function Chart({ kind, labels, names, data, size = '', period = '日', su
       if (kind === 'line' || kind === 'bar' || kind === 'mixed') {
         specific = { series: scaledValues.map((row,i) => {
           const isLine = kind === 'line' || (kind === 'mixed' && i > 0);
-          const color = colors[i % colors.length];
+          const color = colors[i % colors.length] ?? colors[0];
           return {
-            name: seriesNames[i], type: isLine ? 'line' : 'bar', data: row, smooth: true,
+            name: seriesNames[i] ?? `数据${i + 1}`, type: isLine ? 'line' : 'bar', data: row, smooth: true,
             symbol: 'circle', symbolSize: 5, showSymbol: false,
             lineStyle: { width: 2.5, color },
             barMaxWidth: 16, barGap: '40%',
@@ -69,7 +69,7 @@ export function Chart({ kind, labels, names, data, size = '', period = '日', su
           tooltip: { trigger: 'item', backgroundColor: canvas, borderColor: border, textStyle: { color: ink, fontSize: 11 }, formatter: '{b}：{c} ({d}%)' },
           legend: { orient: 'vertical', top: 'center', right: 18, itemWidth: 7, itemHeight: 7, icon: 'circle', itemGap: 17, textStyle: { color: muted, fontSize: 10 } },
           xAxis: { show: false }, yAxis: { show: false },
-          series: [{ type: 'pie', center: ['33%','48%'], radius: ['51%','69%'], avoidLabelOverlap: true, label: { show: false }, itemStyle: { borderWidth: 3, borderColor: canvas, borderRadius: 5, shadowBlur: 14, shadowColor: echarts.color.modifyAlpha(colors[0],.18), shadowOffsetY: 5 }, emphasis: { scaleSize: 5 }, data: pieNames.map((name,i) => ({ name, value: pieValues[i] })) }],
+          series: [{ type: 'pie', center: ['33%','48%'], radius: ['51%','69%'], avoidLabelOverlap: true, label: { show: false }, itemStyle: { borderWidth: 3, borderColor: canvas, borderRadius: 5, shadowBlur: 14, shadowColor: echarts.color.modifyAlpha(colors[0],.18), shadowOffsetY: 5 }, emphasis: { scaleSize: 5 }, data: pieNames.map((name,i) => ({ name, value: pieValues[i] ?? 0 })) }],
           graphic: [{ type: 'text', left: '23%', top: '40%', style: { text: '100%', fill: ink, fontSize: 24, fontWeight: 800, fontFamily: 'Manrope, sans-serif' } }, { type: 'text', left: '26%', top: '54%', style: { text: '车辆分布', fill: muted, fontSize: 9 } }],
         };
       } else if (kind === 'radar') {
@@ -77,7 +77,7 @@ export function Chart({ kind, labels, names, data, size = '', period = '日', su
           xAxis: { show: false }, yAxis: { show: false }, tooltip: { trigger: 'item', backgroundColor: canvas, borderColor: border, textStyle: { color: ink, fontSize: 11 } },
           legend: { top: 0, right: 14, itemWidth: 8, itemHeight: 5, textStyle: { color: muted, fontSize: 9 } },
           radar: { center: ['50%','53%'], radius: '65%', splitNumber: 4, indicator: (labels ?? ['行车安全','网络覆盖','设备健康','响应速度','通行效率','能源效率']).map(name => ({name,max:100})), axisName: { color: muted, fontSize: 9 }, splitArea: { areaStyle: { color: [echarts.color.modifyAlpha(colors[1],.015),echarts.color.modifyAlpha(colors[1],.035)] } }, splitLine: { lineStyle: { color: border } }, axisLine: { lineStyle: { color: border } } },
-          series: [{ type: 'radar', symbol: 'circle', symbolSize: 4, data: (data ?? [[94,88,92,97,89,86],[75,72,80,85,73,75]]).map((value,i) => ({ value, name: names?.[i] ?? ['当前表现','行业均值'][i], lineStyle: { width: 2 }, areaStyle: { color: colors[i], opacity: .13 } })) }],
+          series: [{ type: 'radar', symbol: 'circle', symbolSize: 4, data: (data ?? [[94,88,92,97,89,86],[75,72,80,85,73,75]]).map((value,i) => ({ value, name: names?.[i] ?? (i === 0 ? '当前表现' : '行业均值'), lineStyle: { width: 2 }, areaStyle: { color: colors[i] ?? colors[0], opacity: .13 } })) }],
         };
       } else if (kind === 'horizontal') {
         specific = { legend: { show: false }, grid: { left: 67, right: 35, top: 15, bottom: 28 }, xAxis: { type: 'value', axisLabel: { color: muted, fontSize: 9 }, splitLine: { lineStyle: { color: border, type: 'dashed' } } }, yAxis: { type: 'category', inverse: true, data: labels ?? ['浦东新区','闵行区','徐汇区','黄浦区','嘉定区'], axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: muted, fontSize: 10 } }, series: [{ type: 'bar', barWidth: 12, showBackground: true, backgroundStyle: { color: echarts.color.modifyAlpha(colors[0],.04), borderRadius: 4 }, data: data?.[0] ?? [92,85,76,68,57], itemStyle: { borderRadius: [0,4,4,0], color: new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:colors[0]},{offset:1,color:colors[1]}]) }, label: { show: true, position: 'right', color: muted, fontSize: 10 } }] };
