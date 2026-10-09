@@ -13,7 +13,19 @@ export function Chart({ kind, labels, names, data, size = '', period = '日', su
       const element = container.current;
       if (cancelled || !element) return;
       const css = getComputedStyle(document.documentElement);
-      const token = (name: string) => css.getPropertyValue(name).trim();
+      // Resolve semantic OKLCH tokens to sRGB for ECharts' color interpolation parser.
+      const swatch = document.createElement('canvas');
+      swatch.width = 1; swatch.height = 1;
+      const context = swatch.getContext('2d');
+      const token = (name: string) => {
+        const value = css.getPropertyValue(name).trim();
+        if (!context) return value;
+        context.clearRect(0, 0, 1, 1);
+        context.fillStyle = value;
+        context.fillRect(0, 0, 1, 1);
+        const pixel = context.getImageData(0, 0, 1, 1).data;
+        return `rgba(${pixel[0]},${pixel[1]},${pixel[2]},${pixel[3] / 255})`;
+      };
       const colors = ['--primary', '--cyan', '--success', '--violet', '--warning'].map(token);
       const ink = token('--foreground');
       const muted = token('--muted-foreground');
